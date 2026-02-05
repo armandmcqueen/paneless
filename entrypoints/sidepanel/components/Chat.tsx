@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import {
   AssistantRuntimeProvider,
   useLocalRuntime,
@@ -6,7 +6,9 @@ import {
   ComposerPrimitive,
   MessagePrimitive,
 } from '@assistant-ui/react';
+import Markdown from 'react-markdown';
 import { createAnthropicAdapter } from '../../lib/anthropic-adapter';
+import { buildSystemPrompt } from '../../lib/page-content';
 import './Chat.css';
 
 function UserMessage() {
@@ -23,7 +25,13 @@ function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="message message-assistant">
       <MessagePrimitive.Content
-        components={{ Text: ({ text }) => <p>{text}</p> }}
+        components={{
+          Text: ({ text }) => (
+            <div className="markdown">
+              <Markdown>{text}</Markdown>
+            </div>
+          ),
+        }}
       />
     </MessagePrimitive.Root>
   );
@@ -65,11 +73,17 @@ function Thread() {
 export default function Chat({
   apiKey,
   onOpenSettings,
+  onOpenDebug,
 }: {
   apiKey: string;
   onOpenSettings: () => void;
+  onOpenDebug: () => void;
 }) {
-  const adapter = useMemo(() => createAnthropicAdapter(apiKey), [apiKey]);
+  const getSystemPrompt = useCallback(() => buildSystemPrompt(), []);
+  const adapter = useMemo(
+    () => createAnthropicAdapter(apiKey, getSystemPrompt),
+    [apiKey, getSystemPrompt],
+  );
   const runtime = useLocalRuntime(adapter);
 
   return (
@@ -77,9 +91,14 @@ export default function Chat({
       <div className="chat-container">
         <div className="chat-header">
           <span className="chat-title">Paneless</span>
-          <button className="settings-button" onClick={onOpenSettings}>
-            Settings
-          </button>
+          <div className="chat-header-buttons">
+            <button className="header-button" onClick={onOpenDebug}>
+              Debug
+            </button>
+            <button className="header-button" onClick={onOpenSettings}>
+              Settings
+            </button>
+          </div>
         </div>
         <Thread />
       </div>
