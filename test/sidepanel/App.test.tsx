@@ -20,10 +20,11 @@ vi.mock('../../entrypoints/sidepanel/components/ApiKeyForm', () => ({
 }));
 
 vi.mock('../../entrypoints/sidepanel/components/Chat', () => ({
-  default: ({ apiKey, onOpenSettings }: { apiKey: string; onOpenSettings: () => void }) => (
+  default: ({ apiKey, onOpenSettings, onOpenDebug }: { apiKey: string; onOpenSettings: () => void; onOpenDebug: () => void }) => (
     <div data-testid="chat">
       <span data-testid="chat-key">{apiKey}</span>
       <button onClick={onOpenSettings}>MockSettings</button>
+      <button onClick={onOpenDebug}>MockDebug</button>
     </div>
   ),
 }));
@@ -33,6 +34,14 @@ vi.mock('../../entrypoints/sidepanel/components/Settings', () => ({
     <div data-testid="settings">
       <button onClick={onBack}>MockBack</button>
       <button onClick={onKeyCleared}>MockClearKey</button>
+    </div>
+  ),
+}));
+
+vi.mock('../../entrypoints/sidepanel/components/DebugPanel', () => ({
+  default: ({ onBack }: { onBack: () => void }) => (
+    <div data-testid="debug">
+      <button onClick={onBack}>MockDebugBack</button>
     </div>
   ),
 }));
@@ -81,6 +90,20 @@ describe('App', () => {
     expect(screen.getByTestId('settings')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('MockBack'));
+    expect(screen.getByTestId('chat')).toBeInTheDocument();
+  });
+
+  it('navigates to debug and back', async () => {
+    mockGetApiKey.mockResolvedValue('sk-ant-test-key');
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByTestId('chat')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('MockDebug'));
+    expect(screen.getByTestId('debug')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('MockDebugBack'));
     expect(screen.getByTestId('chat')).toBeInTheDocument();
   });
 

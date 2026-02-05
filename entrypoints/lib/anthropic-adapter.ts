@@ -4,7 +4,10 @@ import { convertMessages } from './message-utils';
 
 const MODEL = 'claude-sonnet-4-20250514';
 
-export function createAnthropicAdapter(apiKey: string): ChatModelAdapter {
+export function createAnthropicAdapter(
+  apiKey: string,
+  getSystemPrompt?: () => Promise<string | null>,
+): ChatModelAdapter {
   const client = new Anthropic({
     apiKey,
     dangerouslyAllowBrowser: true,
@@ -13,11 +16,20 @@ export function createAnthropicAdapter(apiKey: string): ChatModelAdapter {
   return {
     async *run({ messages, abortSignal }) {
       const anthropicMessages = convertMessages(messages);
+
+      let systemPrompt: string | null = null;
+      try {
+        systemPrompt = (await getSystemPrompt?.()) ?? null;
+      } catch (err) {
+        console.warn('[Paneless] Failed to get system prompt:', err);
+      }
+
       const stream = await client.messages.create({
         model: MODEL,
         max_tokens: 4096,
         messages: anthropicMessages,
         stream: true,
+        ...(systemPrompt ? { system: systemPrompt } : {}),
       }, { signal: abortSignal });
 
       let text = '';

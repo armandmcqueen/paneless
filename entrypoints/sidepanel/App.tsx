@@ -3,6 +3,7 @@ import { getApiKey, watchApiKey } from '../lib/storage';
 import ApiKeyForm from './components/ApiKeyForm';
 import Chat from './components/Chat';
 import Settings from './components/Settings';
+import DebugPanel from './components/DebugPanel';
 import './App.css';
 
 class ErrorBoundary extends Component<
@@ -29,7 +30,8 @@ type AppState =
   | { screen: 'loading' }
   | { screen: 'needs-key' }
   | { screen: 'chat'; apiKey: string }
-  | { screen: 'settings'; apiKey: string };
+  | { screen: 'settings'; apiKey: string }
+  | { screen: 'debug'; apiKey: string };
 
 export default function App() {
   const [state, setState] = useState<AppState>({ screen: 'loading' });
@@ -68,7 +70,7 @@ export default function App() {
     );
   }
 
-  // Keep Chat mounted (hidden) when on settings to avoid assistant-ui unmount errors.
+  // Keep Chat mounted (hidden) when on settings/debug to avoid assistant-ui unmount errors.
   // AssistantRuntimeProvider throws "Tried to unmount a fiber that is already unmounted"
   // if removed from the tree, so we hide instead of unmounting.
   return (
@@ -87,6 +89,9 @@ export default function App() {
             onOpenSettings={() =>
               setState({ screen: 'settings', apiKey: state.apiKey })
             }
+            onOpenDebug={() =>
+              setState({ screen: 'debug', apiKey: state.apiKey })
+            }
           />
         </ErrorBoundary>
       </div>
@@ -94,6 +99,11 @@ export default function App() {
         <Settings
           onBack={() => setState({ screen: 'chat', apiKey: state.apiKey })}
           onKeyCleared={() => setState({ screen: 'needs-key' })}
+        />
+      )}
+      {state.screen === 'debug' && (
+        <DebugPanel
+          onBack={() => setState({ screen: 'chat', apiKey: state.apiKey })}
         />
       )}
     </>

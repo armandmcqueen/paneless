@@ -115,4 +115,52 @@ describe('createAnthropicAdapter', () => {
       expect.objectContaining({ signal: abortController.signal }),
     );
   });
+
+  it('passes system prompt when getSystemPrompt returns a string', async () => {
+    mockCreate.mockResolvedValue(fakeStream(['ok']));
+
+    const getSystemPrompt = async () => 'You are a helpful assistant.';
+    const adapter = createAnthropicAdapter('sk-ant-key123', getSystemPrompt);
+    const gen = adapter.run(makeRunOptions([makeUserMessage('Hi')]));
+
+    for await (const _ of gen as AsyncGenerator<any>) {
+      // drain
+    }
+
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        system: 'You are a helpful assistant.',
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('does not pass system param when getSystemPrompt is not provided', async () => {
+    mockCreate.mockResolvedValue(fakeStream(['ok']));
+
+    const adapter = createAnthropicAdapter('sk-ant-key123');
+    const gen = adapter.run(makeRunOptions([makeUserMessage('Hi')]));
+
+    for await (const _ of gen as AsyncGenerator<any>) {
+      // drain
+    }
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs).not.toHaveProperty('system');
+  });
+
+  it('does not pass system param when getSystemPrompt returns null', async () => {
+    mockCreate.mockResolvedValue(fakeStream(['ok']));
+
+    const getSystemPrompt = async () => null;
+    const adapter = createAnthropicAdapter('sk-ant-key123', getSystemPrompt);
+    const gen = adapter.run(makeRunOptions([makeUserMessage('Hi')]));
+
+    for await (const _ of gen as AsyncGenerator<any>) {
+      // drain
+    }
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs).not.toHaveProperty('system');
+  });
 });
