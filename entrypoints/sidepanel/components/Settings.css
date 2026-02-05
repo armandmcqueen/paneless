@@ -1,0 +1,65 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+
+.settings-back-button {
+  background: none;
+  border: 1px solid #d4d4d4;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.settings-back-button:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
+.settings-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.settings-content {
+  padding: 20px 16px;
+}
+
+.settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.settings-description {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.settings-clear-button {
+  padding: 8px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.settings-clear-button:hover {
+  background: #b91c1c;
+}
