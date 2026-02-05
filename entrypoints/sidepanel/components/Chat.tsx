@@ -6,6 +6,7 @@ import {
   ComposerPrimitive,
   MessagePrimitive,
 } from '@assistant-ui/react';
+import Markdown from 'react-markdown';
 import { createAnthropicAdapter } from '../../lib/anthropic-adapter';
 import { buildSystemPrompt } from '../../lib/page-content';
 import './Chat.css';
@@ -24,7 +25,13 @@ function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="message message-assistant">
       <MessagePrimitive.Content
-        components={{ Text: ({ text }) => <p>{text}</p> }}
+        components={{
+          Text: ({ text }) => (
+            <div className="markdown">
+              <Markdown>{text}</Markdown>
+            </div>
+          ),
+        }}
       />
     </MessagePrimitive.Root>
   );

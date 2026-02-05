@@ -6,4 +6,7 @@ export default defineConfig({
   manifest: {
     permissions: ['storage', 'tabs'],
   },
+  runner: {
+    startUrls: ['https://news.ycombinator.com'],
+  },
 });
